@@ -1,0 +1,56 @@
+name: OptikLink Auto Login
+
+on:
+  # 每天 UTC 4:00 运行（北京时间 12:00）
+  schedule:
+    - cron: '0 4 * * *'
+  # 手动触发
+  workflow_dispatch:
+
+jobs:
+  login:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout private repo
+        uses: actions/checkout@v4
+        with:
+          repository: kamanorga/OptikLink-Auto-Login
+          token: ${{ secrets.PRIVATE_REPO_TOKEN }}
+          path: scripts
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        working-directory: scripts
+        run: |
+          pip install camoufox requests
+          python -m camoufox fetch
+
+      - name: Run login script
+        working-directory: scripts
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python main.py
+
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: scripts/screenshots/
+          retention-days: 7
+
+      - name: Update session file to private repo
+        if: success()
+        working-directory: scripts
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add OPTIKLINK_DISCORD_SESSION.json
+          git diff --staged --quiet || git commit -m "Update session $(date +'%Y-%m-%d')"
+          git push
