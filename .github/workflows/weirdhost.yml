@@ -27,7 +27,7 @@ jobs:
         working-directory: scripts
         run: |
           pip install -r requirements.txt
-          ${{ secrets.POST_INSTALL_CMD }}
+          ${{ secrets.FETCH_BROWSER_CMD }}
       
       - name: Run renew script
         working-directory: scripts
