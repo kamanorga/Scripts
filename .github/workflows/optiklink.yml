@@ -27,8 +27,8 @@ jobs:
       - name: Install dependencies
         working-directory: scripts
         run: |
-          pip install camoufox requests
-          python -m camoufox fetch
+          pip install ${{ vars.PIP_DEPS }}
+          ${{ vars.FETCH_BROWSER_CMD }}
 
       - name: Run login script
         working-directory: scripts
