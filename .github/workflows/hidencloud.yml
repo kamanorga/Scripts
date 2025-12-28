@@ -25,8 +25,8 @@ jobs:
     - name: Install dependencies
       working-directory: scripts
       run: |
-          pip install ${{ vars.PIP_DEPS }}
-          ${{ vars.FETCH_BROWSER_CMD }}
+        pip install ${{ vars.PIP_DEPS }}
+        ${{ vars.FETCH_BROWSER_CMD }}
 
     - name: Run script
       working-directory: scripts
