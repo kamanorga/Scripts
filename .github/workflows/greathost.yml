@@ -23,9 +23,10 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
+        working-directory: scripts
         run: |
-          pip install -r scripts/requirements.txt
-          python -m camoufox fetch
+          pip install ${{ vars.PIP_DEPS }}
+          ${{ vars.FETCH_BROWSER_CMD }}
 
       - name: Run renew script
         env:
