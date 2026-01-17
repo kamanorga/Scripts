@@ -1,0 +1,39 @@
+name: Axenthost Auto Claim
+
+on:
+  schedule:
+    # 每半时运行一次
+    - cron: '*/30 * * * *'
+  workflow_dispatch:  # 支持手动触发
+
+jobs:
+  claim:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout private repo
+        uses: actions/checkout@v4
+        with:
+          repository: kamanorga/Axenthost-Auto-Claim
+          token: ${{ secrets.PRIVATE_REPO_TOKEN }}
+          path: scripts
+      
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        working-directory: scripts
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: pip install -r requirements.txt -q > /dev/null 2>&1
+      
+      - name: Run claim script
+        working-directory: scripts
+        env:
+          AXENTHOST_MAIL: ${{ secrets.AXENTHOST_MAIL }}
+          AXENTHOST_PASS: ${{ secrets.AXENTHOST_PASS }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python main.py
